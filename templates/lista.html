@@ -1,0 +1,107 @@
+{% extends "template.html" %}
+{% block conteudo %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='tabela.css') }}">
+</head>
+
+    <script>
+        function toggleObservacao(button) {
+            const box = button.parentElement.querySelector('.observacao-box');
+            box.classList.toggle('d-none');
+        }
+    </script>
+
+    <div class="container">
+        <h1>Forecast - Produtos Compra</h1>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle shadow-sm">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Código</th>
+                        <th>Descrição</th>
+                        <th>Mês 1</th>
+                        <th>Mês 2</th>
+                        <th>Mês 3</th>
+                        <th>Mês atual</th>
+                        <th>Trim</th>
+                        <th>Sem</th>
+                        <th>Est. Atual</th>
+                        <th>Est. Seg.</th>
+                        <th>Previsão IA</th>
+                        <th>Observação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in lista_produtos %}
+                    <tr>
+                        <td>{{ registro.item }}</td>
+                        <td>{{ registro.descricao }}</td>
+                        <td>{{ registro.mes1 }}</td>
+                        <td>{{ registro.mes2 }}</td>
+                        <td>{{ registro.mes3 }}</td>
+                        <td>{{ registro.mes3 }}</td>
+                        <td>{{ registro.media_trimestre }}</td>
+                        <td>{{ registro.media_semestre }}</td>
+                        <td>200</td>
+                        <td>100</td>
+                        <td>50</td>
+                         <td>
+                            <!-- Botão: Adicionar Observação -->
+                            <button class="btn btn-sm btn-outline-primary" onclick="toggleObservacao(this)">
+                                <i class="fas fa-comment-alt"></i>
+                            </button>
+
+                            <!-- Botão: Visualizar Observação -->
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                                    data-bs-target="#modalObservacao"
+                                    data-observacao="{{ registro.observacao|default('Sem observação') }}"
+                                    title="Ver observação">
+                                <i class="fas fa-eye"></i>
+                            </button>
+
+                            <!-- Área de adicionar observação (inline) -->
+                            <div class="observacao-box mt-2 d-none">
+                                <textarea class="form-control" rows="2" placeholder="Digite a observação..."></textarea>
+                                <button class="btn btn-sm btn-success mt-1">Salvar</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalObservacao" tabindex="-1" aria-labelledby="modalObservacaoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalObservacaoLabel">Observação do Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <p id="conteudoObservacao" class="text-muted">Carregando...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    function toggleObservacao(button) {
+        const box = button.parentElement.querySelector('.observacao-box');
+        box.classList.toggle('d-none');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('modalObservacao');
+        modal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const observacao = button.getAttribute('data-observacao') || 'Sem observação';
+            document.getElementById('conteudoObservacao').innerText = observacao;
+        });
+    });
+    </script>
+{% endblock %}
