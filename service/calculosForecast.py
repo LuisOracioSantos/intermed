@@ -16,7 +16,8 @@ def calcular_medias_vendas(dados_vendas_api: list) -> pd.DataFrame:
 
     resumo = []
 
-    print(df)
+
+    print("Colunas disponíveis:", df.columns.tolist())
 
     for (item, descricao), grupo in df.groupby(['item', 'descricao']):
         grupo_ordenado = grupo.sort_values(by='mes')
@@ -37,7 +38,8 @@ def calcular_medias_vendas(dados_vendas_api: list) -> pd.DataFrame:
             'mes2': ultimos_3_valores[1],
             'mes3': ultimos_3_valores[2],
             'media_trimestre': round(media_3, 2),
-            'media_semestre': round(media_6, 2)
+            'media_semestre': round(media_6, 2),
+            'saldodisponivel' : grupo_ordenado['saldodisponivel'].iloc[-1] if 'saldodisponivel' in grupo_ordenado.columns else None
         })
 
     print(resumo)

@@ -1,8 +1,19 @@
+from collections import defaultdict
+from datetime import datetime
+from math import ceil
+
 from flask import Flask, render_template, request, redirect, session, flash, url_for, jsonify
-
+import os
+from config import DevelopmentConfig, ProductionConfig
 from service import service_bp
-from service.controllerservice import buscadados
+from service.clientesfiltros import clientes_nao_valiosos, clientes_valiosos, clientes_compraram_uma_vez
+from service.controllerservice import getDadosForecastProduto, get_dados_forecast_venda_cliente, atualizarTodos, \
+    get_dados_forecast_venda_cliente_id
+from dotenv import load_dotenv
 
+
+
+load_dotenv()
 
 class Usuario:
     def __init__(self, nome, nickname, senha):
@@ -15,95 +26,93 @@ usuario1 = Usuario("admin", "admin", "admin")
 
 usuarios = { usuario1.nickname : usuario1}
 
-##listaprodutos = buscadados()
-
-listaprodutos =[
-    {
-        "item": "AP1010",
-        "descricao": "Produto A",
-        "mes1": 1200,
-        "mes2": 1500,
-        "mes3": 1300,
-        "media_trimestre": round((1200 + 1500 + 1300) / 3, 2),
-        "media_semestre": round((1200 + 1500 + 1300 + 1400 + 1600 + 1700) / 6, 2)  # Exemplo completo
-    },
-    {
-        "item": "CE2025",
-        "descricao": "Produto B",
-        "mes1": 800,
-        "mes2": 950,
-        "mes3": 1100,
-        "media_trimestre": round((800 + 950 + 1100) / 3, 2),
-        "media_semestre": round((800 + 950 + 1100 + 1000 + 1050 + 1150) / 6, 2)
-    },
-    {
-        "item": "XP3050",
-        "descricao": "Produto C",
-        "mes1": 300,
-        "mes2": 400,
-        "mes3": 500,
-        "media_trimestre": round((300 + 400 + 500) / 3, 2),
-        "media_semestre": round((300 + 400 + 500 + 600 + 700 + 800) / 6, 2)
-    }
-]
-
-listaclientes =[
-    {
-        "codigo": "1530",
-        "cliente": "Cliente 1",
-        "totalvendames": 5500,
-        "observacao": "Venda realizado na semana passada",
-        "previsaoia": "Possivel venda"
-
-    },
-    {
-        "codigo": "1010",
-        "cliente": "Cliente 2",
-        "totalvendames": 3200,
-        "observacao": "Venda realizado na semana passada",
-        "previsaoia": "Possivel venda"
-    },
-    {
-        "codigo": "2230",
-        "cliente": "Cliente 3",
-        "totalvendames": 2600,
-        "observacao": "Venda realizado na semana passada",
-        "previsaoia": "Possivel venda"
-    }
-]
-
-
 
 app = Flask(__name__)
 app.secret_key = 'forecast'
+
+env = os.getenv('FLASK_ENV', 'development')
+if env == 'production':
+    app.config.from_object(ProductionConfig)
+else:
+    app.config.from_object(DevelopmentConfig)
+
 app.register_blueprint(service_bp)
 
 @app.route('/')
 def index():
+    page = request.args.get('page', 1, type=int)
+    per_page = 20  # Número de produtos por página
 
-    return render_template('lista.html', titulo='SQ Quimica', lista_produtos= listaprodutos)
+    listaprodutos = getDadosForecastProduto()
+    total = len(listaprodutos)
+
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    lista_pag = listaprodutos[start:end]
+    total_pages = ceil(total / per_page)
+
+    return render_template('listaprodutos.html',
+                           titulo='SQ Quimica',
+                           lista_produtos=lista_pag,
+                           page=page,
+                           total=total,
+                           total_pages=total_pages)
 
 
-@app.route('/vendacliente')
-def vendacliente():
-    return render_template('listaclientes.html', titulo='SQ Quimica', lista_clientes = listaclientes)
+@app.route('/vendacliente', defaults={'categoria': 'valiosos'})
+@app.route('/vendacliente/<categoria>')
+def vendacliente(categoria):
 
-@app.route('/api/clientes/<codigo>/produtos')
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+
+    listaclientes = get_dados_forecast_venda_cliente()
+
+
+    if categoria == 'valiosos':
+        clientes_filtrados = clientes_valiosos(listaclientes)
+    elif categoria == 'regulares':
+        clientes_filtrados = clientes_nao_valiosos(listaclientes)
+    elif categoria == 'inativos':
+        clientes_filtrados = clientes_compraram_uma_vez(listaclientes)
+    else:
+        return f"Categoria '{categoria}' não reconhecida", 400
+
+    total = len(clientes_filtrados)
+
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    lista_pag = clientes_filtrados[start:end]
+    total_pages = ceil(total / per_page)
+
+    return render_template('listaclientes.html',
+                           titulo='SQ Quimica',
+                           lista_clientes = lista_pag,
+                           total=total,
+                           page=page,
+                           total_pages=total_pages)
+
+
+@app.route('/getDadosVendaClienteId/<int:id>', methods=['GET'])
 def api_produtos_cliente(codigo):
     produtos = buscar_produtos_vendidos_por_cliente(codigo)
     return jsonify(produtos)
 
+
 def buscar_produtos_vendidos_por_cliente(codigo):
-    return [
-        {'nome': 'Arroz 5kg', 'quantidade': 20, 'data': '2025-06-01', 'valor': 200.00},
-        {'nome': 'Feijão 1kg', 'quantidade': 15, 'data': '2025-06-05', 'valor': 90.00}
-    ]
+    return get_dados_forecast_venda_cliente_id(codigo)
 
 @app.route('/novo')
 def novo():
     if 'usuario_logado' not in session or session['usuario_logado'] == None:
         return redirect(url_for('login', proxima=url_for('novo')))
     return render_template('novo.html', titulo='Novo Jogo')
+
+@app.route('/atualizartodos')
+def atualizatodos():
+    atualizarTodos()
 
 # @app.route('/criar', methods=['POST',])
 # def criar():
@@ -138,4 +147,19 @@ def logout():
     flash('Logout efetuado com sucesso!')
     return redirect(url_for('index'))
 
-app.run(debug=True)
+@app.template_filter('moeda')
+def formatar_moeda(valor):
+    return f'R$ {valor:,.2f}'.replace(',', 'X').replace('.', ',').replace('X', '.')
+
+@app.template_filter('data_br')
+def formatar_data_br(data_str):
+    try:
+        if isinstance(data_str, str):
+            data = datetime.fromisoformat(data_str.replace("Z", "").split("+")[0])
+            return data.strftime('%d/%m/%Y')
+        return data_str
+    except Exception:
+        return data_str
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

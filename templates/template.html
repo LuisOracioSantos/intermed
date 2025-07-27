@@ -8,6 +8,8 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <link rel="stylesheet" href="{{ url_for('static', filename='template.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+        <script src="{{ url_for('static', filename='js/atualizardados.js') }}"></script>
     </head>
     <body>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -21,28 +23,48 @@
             {% endif %}
         {% endwith %}
 
-          <div class="page-header">
-              <h1>{{ titulo }}</h1>
-          </div>
-            <div class="container">
-                <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-                    <div class="container-fluid">
-                        <div class="navbar-nav">
-                        <a class="nav-link" href="{{ ('/') }}"><i class="fas fa-box"></i> Produtos</a>
-                        <a class="nav-link" href="{{ url_for('vendacliente') }}"><i class="fas fa-users"></i> Venda Clientes</a>
-                    </div>
-                </div>
-            </nav>
 
-            {% block conteudo %}{% endblock %}
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm w-100">
+          <div class="container-fluid justify-content-between">
+
+            <!-- Menu da esquerda -->
+            <div class="navbar-nav">
+              <a class="nav-link" href="{{ ('/') }}"><i class="fas fa-box"></i> Produtos</a>
+              <a class="nav-link" href="{{ url_for('vendacliente') }}"><i class="fas fa-users"></i> Venda Clientes</a>
+            </div>
+
+            <!-- Botão com opções na direita -->
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="menuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                Opções
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuButton">
+                <li><a class="dropdown-item" href="#" onclick="atualizarDados()"> Atualizar Dados</a></li>
+                <li><a class="dropdown-item" href="#">Usuário</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Sair</a></li>
+              </ul>
+            </div>
+
+          </div>
+        </nav>
+
+        <div id="mensagem" class="alert d-none mx-3 mt-3" role="alert"></div>
+
+        <div id="loading" class="d-none mx-3 mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Atualizando registros...</span>
+            </div>
         </div>
+
+        {% block conteudo %} {% endblock %}
+
         <footer class="footer">
               <div class="footer-container">
                 <p>&copy; {{ year }} Minha Aplicação. Todos os direitos reservados.</p>
                 <div class="footer-links">
                   <a href="/sobre">Sobre</a>
                   <a href="/contato">Contato</a>
-                  <a href="https://github.com/seu-usuario" target="_blank">GitHub</a>
                 </div>
               </div>
         </footer>

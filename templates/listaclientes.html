@@ -1,8 +1,10 @@
 {% extends "template.html" %}
 {% block conteudo %}
 <link rel="stylesheet" href="{{ url_for('static', filename='tabela.css') }}">
+<script src="{{ url_for('static', filename='js/Table.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ViewItensClientes.js') }}"></script>
 
-</head>
+
      <script>
         function toggleObservacao(button) {
             const box = button.parentElement.querySelector('.observacao-box');
@@ -10,20 +12,23 @@
         }
     </script>
 
-   <div class="container">
-        <h1>Estatísticas dos Clientes</h1>
+    <h1>Estatísticas dos Clientes</h1>
 
-       </div>
-            <div class="container">
-                <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-                    <div class="container-fluid">
-                        <div class="navbar-nav">
-                        <a class="nav-link" href="#"><i class="fas fa-box"></i> Possíveis Venda</a>
-                        <a class="nav-link" href="#"><i class="fas fa-box"></i> Clientes Valiosos</a>
-                        <a class="nav-link" href="#"><i class="fas fa-users"></i> Clientes Novos/Inativos </a>
-                    </div>
+
+    <div class="container-fluid full-width-container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+            <div class="container-fluid">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="#"><i class="fas fa-box"></i> Possíveis Venda</a>
+                    <a class="nav-link" href="/vendacliente/valiosos"><i class="fas fa-box"></i> Clientes Valiosos</a>
+                    <a class="nav-link" href="/vendacliente/inativos"><i class="fas fa-users"></i> Clientes Novos/Inativos </a>
                 </div>
-            </nav>
+            </div>
+        </nav>
+
+        <div class="mb-3">
+            <input type="text" id="filtroTabela" class="form-control" placeholder="Filtrar por código, descrição ou outro campo...">
+        </div>
 
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle shadow-sm">
@@ -31,11 +36,11 @@
                     <tr>
                         <th>Código</th>
                         <th>Cliente</th>
-                        <th>Total Venda ult. Mês</th>
-                        <th>Observação Vendedor</th>
-                        <th>Previsão IA</th>
+                        <th>Data Cad. Cliente</th>
+                        <th>Total Venda</th>
+                        <th>Previsao IA</th>
                         <th>Observação</th>
-                        <th>Detalhes Vendas</th>
+                         <th>Detalhes Vendas</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,8 +48,8 @@
                     <tr>
                         <td>{{ registro.codigo }}</td>
                         <td>{{ registro.cliente }}</td>
-                        <td>{{ registro.totalvendames }}</td>
-                        <td>{{ registro.observacao }}</td>
+                         <td>{{ registro.dataCadastroCli | data_br }}</td>
+                        <td>{{ registro.total_venda | moeda   }}</td>
                         <td>{{ registro.previsaoia }}</td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary" onclick="toggleObservacao(this)">
@@ -54,6 +59,13 @@
                                 <textarea class="form-control" rows="2" placeholder="Digite a observação..."></textarea>
                                 <button class="btn btn-sm btn-success mt-1">Salvar</button>
                             </div>
+                             <!-- Botão: Visualizar Observação -->
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                                    data-bs-target="#modalObservacao"
+                                    data-observacao="{{ registro.observacao|default('Sem observação') }}"
+                                    title="Ver observação">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </td>
                         <td>
                           <button class="btn btn-sm btn-info"
@@ -71,6 +83,25 @@
         </div>
     </div>
 
+    <nav aria-label="Paginação">
+        <ul class="pagination justify-content-center mt-4">
+            <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page - 1 }}">Anterior</a>
+            </li>
+
+            {% for p in range(1, total_pages + 1) %}
+              <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+              </li>
+            {% endfor %}
+
+            <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+              <a class="page-link" href="?page={{ page + 1 }}">Próxima</a>
+            </li>
+
+          </ul>
+        </nav>
+
     <div class="modal fade" id="modalDetalhes" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -83,9 +114,10 @@
               <thead>
                 <tr>
                   <th>Produto</th>
-                  <th>Quantidade</th>
-                  <th>Data Venda</th>
-                  <th>Valor</th>
+                  <th>Descrição</th>
+                  <th>Qtd. Vendida</th>
+                  <th>Valor Total</th>
+                  <th>Data Ultima Venda</th>
                 </tr>
               </thead>
               <tbody id="tabelaProdutos">
@@ -96,36 +128,5 @@
         </div>
       </div>
     </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const modal = document.getElementById('modalDetalhes');
-      modal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const codigo = button.getAttribute('data-codigo');
-        const cliente = button.getAttribute('data-cliente');
-
-        document.getElementById('clienteNome').innerText = cliente;
-
-        fetch(`/api/clientes/${codigo}/produtos`)
-          .then(response => response.json())
-          .then(data => {
-            const tabela = document.getElementById('tabelaProdutos');
-            tabela.innerHTML = ''; // limpa
-            data.forEach(produto => {
-              tabela.innerHTML += `
-                <tr>
-                  <td>${produto.nome}</td>
-                  <td>${produto.quantidade}</td>
-                  <td>${produto.data}</td>
-                  <td>R$ ${produto.valor}</td>
-                </tr>
-              `;
-            });
-          });
-      });
-    });
-</script>
-
 
 {% endblock %}
