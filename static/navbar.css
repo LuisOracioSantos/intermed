@@ -1,0 +1,27 @@
+.logo-navbar {
+    width: 48px;
+    height: auto;
+}
+
+.logo-navbar {
+    max-width: 100%;
+    height: auto;
+}
+
+.principal-navbar {
+    background-color: #ffffff; /* Branco puro */
+    border: 1px solid #dee2e6; /* Borda mais visível */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    z-index: 999;
+}
+
+.principal-navbar .nav-link {
+    color: #333;
+    font-weight: 500;
+}
+
+.principal-navbar .nav-link:hover {
+    color: #0d6efd;
+}

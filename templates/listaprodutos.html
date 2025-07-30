@@ -26,18 +26,18 @@
             <table class="table table-bordered table-hover align-middle shadow-sm">
                 <thead class="table-primary">
                     <tr>
-                        <th>Código</th>
-                        <th>Descrição</th>
-                        <th>Mês 1</th>
-                        <th>Mês 2</th>
-                        <th>Mês 3</th>
-                        <th>Mês atual</th>
-                        <th>Trim</th>
-                        <th>Sem</th>
-                        <th>Est. Atual</th>
-                        <th>Est. Seg.</th>
-                        <th>Previsão IA</th>
-                        <th>Observação</th>
+                        <th style="background-color:#0eaf97; color:white;">Código</th>
+                        <th style="background-color:#0eaf97; color:white;">Descrição</th>
+                        <th style="background-color:#0eaf97; color:white;">Mês 1</th>
+                        <th style="background-color:#0eaf97; color:white;">Mês 2</th>
+                        <th style="background-color:#0eaf97; color:white;">Mês 3</th>
+                        <th style="background-color:#0eaf97; color:white;">Mês atual</th>
+                        <th style="background-color:#0eaf97; color:white;">Trim</th>
+                        <th style="background-color:#0eaf97; color:white;">Sem</th>
+                        <th style="background-color:#0eaf97; color:white;">Est. Atual</th>
+                        <th style="background-color:#0eaf97; color:white;">Est. Seg.</th>
+                        <th style="background-color:#0eaf97; color:white;">Previsão IA</th>
+                        <th style="background-color:#0eaf97; color:white;">Observação</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,12 +56,12 @@
                         <td>50</td>
                          <td>
                             <!-- Botão: Adicionar Observação -->
-                            <button class="btn btn-sm btn-outline-primary" onclick="toggleObservacao(this)">
+                            <button class="btn btn-sm btn-observacao-editar" onclick="toggleObservacao(this)">
                                 <i class="fas fa-comment-alt"></i>
                             </button>
 
                             <!-- Botão: Visualizar Observação -->
-                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                            <button class="btn btn-sm btn-observacao-ver" data-bs-toggle="modal"
                                     data-bs-target="#modalObservacao"
                                     data-observacao="{{ registro.observacao|default('Sem observação') }}"
                                     title="Ver observação">

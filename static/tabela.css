@@ -30,3 +30,39 @@
           padding-left: 20px;
           padding-right: 20px;
         }
+
+        .btn-observacao-editar {
+            background-color: #0baf96;
+            color: #212121;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 4px;
+        }
+
+        .btn-observacao-editar:hover {
+            background-color: #0baf96;
+            color: black;
+        }
+
+        /* Botão: Ver Observação */
+        .btn-observacao-ver {
+            background-color: #dee6e8;
+            color: #212121;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 4px;
+        }
+
+        .btn-observacao-ver:hover {
+            background-color: #0baf96;
+        }
+
+        .btn-info{
+            background-color: #0baf96;
+            color: #212121;
+            border: none;
+        }
+
+        .btn-info:hover {
+            background-color: #0baf96;
+        }

@@ -16,9 +16,6 @@ def calcular_medias_vendas(dados_vendas_api: list) -> pd.DataFrame:
 
     resumo = []
 
-
-    print("Colunas disponíveis:", df.columns.tolist())
-
     for (item, descricao), grupo in df.groupby(['item', 'descricao']):
         grupo_ordenado = grupo.sort_values(by='mes')
         ultimos_valores = grupo_ordenado.tail(6).copy()

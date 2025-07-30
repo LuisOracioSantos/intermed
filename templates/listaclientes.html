@@ -34,13 +34,13 @@
             <table class="table table-bordered table-hover align-middle shadow-sm">
                 <thead class="table-primary">
                     <tr>
-                        <th>Código</th>
-                        <th>Cliente</th>
-                        <th>Data Cad. Cliente</th>
-                        <th>Total Venda</th>
-                        <th>Previsao IA</th>
-                        <th>Observação</th>
-                         <th>Detalhes Vendas</th>
+                        <th style="background-color:#0eaf97; color:white;">Código</th>
+                        <th style="background-color:#0eaf97; color:white;">Cliente</th>
+                        <th style="background-color:#0eaf97; color:white;">Data Cad. Cliente</th>
+                        <th style="background-color:#0eaf97; color:white;">Total Venda</th>
+                        <th style="background-color:#0eaf97; color:white;">Previsao IA</th>
+                        <th style="background-color:#0eaf97; color:white;">Observação</th>
+                         <th style="background-color:#0eaf97; color:white;">Detalhes Vendas</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +52,7 @@
                         <td>{{ registro.total_venda | moeda   }}</td>
                         <td>{{ registro.previsaoia }}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="toggleObservacao(this)">
+                            <button class="btn btn-sm btn-observacao-editar" onclick="toggleObservacao(this)">
                                 <i class="fas fa-comment-alt"></i>
                             </button>
                             <div class="observacao-box mt-2 d-none">
@@ -60,7 +60,7 @@
                                 <button class="btn btn-sm btn-success mt-1">Salvar</button>
                             </div>
                              <!-- Botão: Visualizar Observação -->
-                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                            <button class="btn btn-sm btn-observacao-ver" data-bs-toggle="modal"
                                     data-bs-target="#modalObservacao"
                                     data-observacao="{{ registro.observacao|default('Sem observação') }}"
                                     title="Ver observação">

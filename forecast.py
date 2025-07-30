@@ -2,33 +2,26 @@ from collections import defaultdict
 from datetime import datetime
 from math import ceil
 
-from flask import Flask, render_template, request, redirect, session, flash, url_for, jsonify
+from flask import Flask, render_template, request, redirect, session, flash, url_for, jsonify, app
 import os
+
 from config import DevelopmentConfig, ProductionConfig
 from service import service_bp
 from service.clientesfiltros import clientes_nao_valiosos, clientes_valiosos, clientes_compraram_uma_vez
 from service.controllerservice import getDadosForecastProduto, get_dados_forecast_venda_cliente, atualizarTodos, \
     get_dados_forecast_venda_cliente_id
 from dotenv import load_dotenv
-
-
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
 
 load_dotenv()
 
-class Usuario:
-    def __init__(self, nome, nickname, senha):
-        self.nome = nome
-        self.nickname = nickname
-        self.senha = senha
-
-usuario1 = Usuario("admin", "admin", "admin")
-
-
-usuarios = { usuario1.nickname : usuario1}
-
-
 app = Flask(__name__)
 app.secret_key = 'forecast'
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 env = os.getenv('FLASK_ENV', 'development')
 if env == 'production':
@@ -36,10 +29,36 @@ if env == 'production':
 else:
     app.config.from_object(DevelopmentConfig)
 
+
+# Login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# Simulação de banco de usuários
+class Usuario(UserMixin):
+    def __init__(self, id, nome, nickname, senha):
+        self.id = id
+        self.nome = nome
+        self.nickname = nickname
+        self.senha = senha
+
+usuario1 = Usuario(1, "admin", "admin", "admin")
+usuarios = {usuario1.nickname: usuario1}
+
+@login_manager.user_loader
+def load_user(user_id):
+    for user in usuarios.values():
+        if str(user.id) == str(user_id):
+            return user
+    return None
+
+# Blueprint
 app.register_blueprint(service_bp)
 
 @app.route('/')
-def index():
+@login_required
+def principal():
     page = request.args.get('page', 1, type=int)
     per_page = 20  # Número de produtos por página
 
@@ -62,6 +81,7 @@ def index():
 
 @app.route('/vendacliente', defaults={'categoria': 'valiosos'})
 @app.route('/vendacliente/<categoria>')
+@login_required
 def vendacliente(categoria):
 
     page = request.args.get('page', 1, type=int)
@@ -96,6 +116,7 @@ def vendacliente(categoria):
 
 
 @app.route('/getDadosVendaClienteId/<int:id>', methods=['GET'])
+@login_required
 def api_produtos_cliente(codigo):
     produtos = buscar_produtos_vendidos_por_cliente(codigo)
     return jsonify(produtos)
@@ -114,38 +135,34 @@ def novo():
 def atualizatodos():
     atualizarTodos()
 
-# @app.route('/criar', methods=['POST',])
-# def criar():
-#     nome = request.form['nome']
-#     categoria = request.form['categoria']
-#     console = request.form['console']
-#     jogo = Jogo(nome, categoria, console)
-#     lista.append(jogo)
-#     return redirect(url_for('index'))
 
 @app.route('/login')
 def login():
     proxima = request.args.get('proxima')
     return render_template('login.html', proxima=proxima)
 
-@app.route('/autenticar', methods=['POST',])
+
+@app.route('/autenticar', methods=['POST'])
 def autenticar():
-    if request.form['usuario'] in usuarios:
-        usuario = usuarios[request.form['usuario']]
-        if request.form['senha'] == usuario.senha:
-            session['usuario_logado'] = usuario.nickname
-            flash(usuario.nickname + ' logado com sucesso!')
-            proxima_pagina = request.form['proxima']
-            return redirect(proxima_pagina)
-    else:
-        flash('Usuário não logado.')
-        return redirect(url_for('login'))
+    nickname = request.form['usuario']
+    senha = request.form['senha']
+    usuario = usuarios.get(nickname)
+
+    if usuario and usuario.senha == senha:
+        login_user(usuario)
+        flash(f'{usuario.nickname} logado com sucesso!')
+        proxima = request.form.get('proxima') or url_for('principal')
+        return redirect(proxima)
+
+    flash('Usuário ou senha inválidos')
+    return redirect(url_for('login'))
 
 @app.route('/logout')
+@login_required
 def logout():
-    session['usuario_logado'] = None
+    logout_user()
     flash('Logout efetuado com sucesso!')
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.template_filter('moeda')
 def formatar_moeda(valor):

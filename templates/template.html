@@ -24,30 +24,38 @@
         {% endwith %}
 
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm w-100">
-          <div class="container-fluid justify-content-between">
+        <nav class="navbar navbar-expand-lg navbar-light principal-navbar shadow-sm w-100">
+          <div class="container-fluid justify-content-between align-items-center">
 
-            <!-- Menu da esquerda -->
-            <div class="navbar-nav">
-              <a class="nav-link" href="{{ ('/') }}"><i class="fas fa-box"></i> Produtos</a>
-              <a class="nav-link" href="{{ url_for('vendacliente') }}"><i class="fas fa-users"></i> Venda Clientes</a>
+            <!-- ✅ Imagem no canto esquerdo -->
+            <div class="d-flex align-items-center">
+              <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo"  class="me-3">
+
+              <!-- Links do menu -->
+              <div class="navbar-nav">
+                <a class="nav-link" href="{{ ('/') }}"><i class="fas fa-box"></i> Produtos</a>
+                <a class="nav-link" href="{{ url_for('vendacliente') }}"><i class="fas fa-users"></i> Venda Clientes</a>
+              </div>
             </div>
 
-            <!-- Botão com opções na direita -->
-            <div class="dropdown">
-              <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="menuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                Opções
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuButton">
-                <li><a class="dropdown-item" href="#" onclick="atualizarDados()"> Atualizar Dados</a></li>
-                <li><a class="dropdown-item" href="#">Usuário</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Sair</a></li>
-              </ul>
+            <!-- Botão de opções à direita -->
+            <div class="d-flex align-items-center gap-3">
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="menuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                  Opções
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuButton">
+                  <li><a class="dropdown-item" href="#" onclick="atualizarDados()">Atualizar Dados</a></li>
+                  <li><a class="dropdown-item" href="#">Usuário</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt"></i> Sair</a></li>
+                </ul>
+              </div>
             </div>
-
           </div>
         </nav>
+
 
         <div id="mensagem" class="alert d-none mx-3 mt-3" role="alert"></div>
 
@@ -58,17 +66,6 @@
         </div>
 
         {% block conteudo %} {% endblock %}
-
-        <footer class="footer">
-              <div class="footer-container">
-                <p>&copy; {{ year }} Minha Aplicação. Todos os direitos reservados.</p>
-                <div class="footer-links">
-                  <a href="/sobre">Sobre</a>
-                  <a href="/contato">Contato</a>
-                </div>
-              </div>
-        </footer>
-
     </body>
 
 </html>
