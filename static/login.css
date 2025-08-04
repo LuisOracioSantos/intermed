@@ -39,3 +39,15 @@ body {
         .form-control::placeholder {
             padding-left: 25px;
         }
+
+     .login-logo {
+      display: block;
+      margin: 0 auto 20px auto;
+      max-width: 400px; /* Aumentado de 180px para 250px */
+      height: auto;
+    }
+
+    .btn-login {
+      width: 100%;
+      font-size: 1.2em;
+    }

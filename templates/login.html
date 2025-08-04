@@ -9,27 +9,27 @@
 </head>
   </head>
   <body>
-    <div class="container">
+  <div class="login-container">
+    <!-- Logo centralizada e maior -->
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="login-logo">
 
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul id="messages" class="list-unstyled">
-                {% for message in messages %}
-                    <li class="alert alert-success">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
 
-        <div class="login-container">
-        <h2 class="login-title"><i class="fas fa-sign-in-alt"></i> Faça seu login</h2>
-            <form method="POST" action="{{ url_for('autenticar') }}">
-                <input type="hidden" name="proxima" value="{{ proxima or url_for('principal') }}">
-                <p><label>Usuário:</label> <input class="form-control" type="text" name="usuario" required></p>
-                <p><label>Senha:</label> <input class="form-control" type="password" name="senha" required></p>
-                <p><button class="btn btn-primary" type="submit">Entrar</button></p>
-            </form>
-        </div>
-    </div>
+    <form method="POST" action="{{ url_for('autenticar') }}">
+      <input type="hidden" name="proxima" value="{{ proxima or url_for('principal') }}">
+      <p><label>Usuário:</label> <input class="form-control" type="text" name="usuario" required></p>
+      <p><label>Senha:</label> <input class="form-control" type="password" name="senha" required></p>
+      <p><button class="btn btn-success btn-login" type="submit">Entrar</button></p>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul id="messages" class="list-unstyled mt-3">
+        {% for message in messages %}
+          <li class="alert alert-success">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+  </div>
 </body>
 </html>
