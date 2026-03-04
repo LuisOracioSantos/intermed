@@ -1,0 +1,233 @@
+{% extends "template.html" %}
+{% block conteudo %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tabela.css') }}">
+<script src="{{ url_for('static', filename='js/Table.js') }}" ></script>
+<script src="{{ url_for('static', filename='js/forecast.js') }}" ></script>
+
+<script>
+    function toggleObservacao(button) {
+        const box = button.parentElement.querySelector('.observacao-box');
+        box.classList.toggle('d-none');
+    }
+</script>
+
+<h1 id="tituloPagina">Forecast </h1>
+<div class="row full-height-container">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="mb-3">
+                <div class="btn-group">
+                    <button type="button" style="background-color:#0eaf97" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false">Opções Forecast
+                    </button>
+                    <ul class="dropdown-menu" >
+                        {% if current_user.tipo in ['ADMIN', 'ADMIN_COMPRAS', ADMIN_REPRESENTANTE] %}
+                            <li><a class="dropdown-item" href="#" id="criarForecastBtn">Criar Forecast do mês</a></li>
+                         {% endif %}
+                        <li><a class="dropdown-item" href="#" id="btnAbrirModal"> Buscar Forecast</a></li>
+                        <!--  <li><a class="dropdown-item" href="#" id="btnAtualizaEstoque">Atualizar Estoque</a></li>
+                        <li><a class="dropdown-item" href="#" id="btnAtualizaLeadtime">Atualizar LeadTime</a></li>
+                        <li><a class="dropdown-item" href="#" id="btnAtualizaVendas">Atualizar Vendas</a></li>-->
+                        <!-- <li> <a class="dropdown-item d-flex gap-2 align-items-center" href="#"> <svg class="bi" width="16" height="16" aria-hidden="true"><use xlink:href="#film"></use></svg>Movies</a> </li> -->
+                    </ul>
+                </div>
+                {% if current_user.tipo in ['ADMIN', 'ADMIN_COMPRAS', ADMIN_REPRESENTANTE] %}
+                    <button id="btnAtualizar" class="btn btn-success" style="background-color:#0eaf97">
+                      <i class="fas fa-sync-alt"></i> Atualizar Dados
+                    </button>
+
+                 <button id="btnFecharForecast" class="btn btn-danger float-end">Fechar Forecast</button>
+                {% endif %}
+                <div id="status" class="mt-2 text-muted small"></div>
+            </div>
+
+            <div class="mb-3">
+                <input type="text" id="filtroTabela" class="form-control"
+                       placeholder="Filtrar por código, descrição ou outro campo...">
+            </div>
+
+            <div class="table-responsive" id="tabelaForecast">
+                <table class="table table-bordered table-hover align-middle shadow-sm">
+                    <thead class="table-primary">
+                    <tr>
+                        <th style="background-color:#0eaf97; color:white; display: none;" id="idmesforecast">idmesforecast</th>
+                        <th style="background-color:#0eaf97; color:white; display: none;" id="idforecast" >idforecast</th>
+                        <th style="background-color:#0eaf97; color:white; display: none;" id="iditemprincipal">iditemprincipal</th>
+                        <th style="background-color:#0eaf97; color:white;">Código</th>
+                        <th style="background-color:#0eaf97; color:white;">Descrição</th>
+                        <th style="background-color:#0eaf97; color:white;" id="mes1">Mês 1</th>
+                        <th style="background-color:#0eaf97; color:white;" id="mes2">Mês 2</th>
+                        <th style="background-color:#0eaf97; color:white;" id="mes3">Mês 3</th>
+                        <th style="background-color:#0eaf97; color:white;">Mês atual</th>
+                        <th style="background-color:#0eaf97; color:white;">Trim</th>
+                        <th style="background-color:#0eaf97; color:white;">Sem</th>
+                        <th style="background-color:#0eaf97; color:white;">Desvio Padrão (Trim)</th>
+                        <th style="background-color:#0eaf97; color:white;">Est. Atual</th>
+                        <th style="background-color:#0eaf97; color:white;">Est. Seg.</th>
+                        <th style="background-color:#0eaf97; color:white;">Lead time.</th>
+                        <th style="background-color:#0eaf97; color:white;" id="chegada1" data-group="chegada">Chegada1 <span class="toggle-colunas" data-group="chegada" style="cursor:pointer;">▼</span> </th>
+                        <th style="background-color:#0eaf97; color:white;" id="chegada2" data-group="chegada">Chegada2 </th>
+                        <th style="background-color:#0eaf97; color:white;" id="chegada3" data-group="chegada">Chegada3 </th>
+                        <th style="background-color:#0eaf97; color:white;" id="chegada4" data-group="chegada">Chegada4 </th>
+                        <th style="background-color:#0eaf97; color:white;" id="prog1" data-group="prog">Prog1 <span class="toggle-colunas" data-group="prog" style="cursor:pointer;">▼</span> </th>
+                        <th style="background-color:#0eaf97; color:white;" id="prog2" data-group="prog">Prog2 </th>
+                        <th style="background-color:#0eaf97; color:white;" id="prog3" data-group="prog">Prog3 </th>
+                        <th style="background-color:#0eaf97; color:white;" id="prog4" data-group="prog">Prog4 </th>
+                        <th style="background-color:#0eaf97; color:white;" id="prevIA">Previsão IA</th>
+                        <th style="background-color:#0eaf97; color:white;" id="qtdcomprada">Qtd. Comprado</th>
+                        <th style="background-color:#0eaf97; color:white;" id="observacao">Observação</th>
+                        <th style="background-color:#0eaf97; color:white;display: none;">seqmes</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for registro in lista_produtos %}
+                    <tr>
+                         <td style="display: none;">{{ registro.idMesForecast }}</td>
+                        <td style="display: none;">{{ registro.iddadosforecast }}</td>
+                        <td style="display: none;" >{{ registro.idprodutoprincipal }}</td>
+                        <td>
+                          <a href="{{ url_for('configproduto',
+                                               itemid=registro.idprodutoprincipal,
+                                               item=registro.item,
+                                               descricao=registro.descricao) }}">
+                            {{ registro.item }}
+                          </a>
+                        </td>
+                        <td>{{ registro.descricao }}</td>
+                        <td>{{ registro.vendames1 }}</td>
+                        <td>{{ registro.vendames2 }}</td>
+                        <td>{{ registro.vendames3 }}</td>
+                        <td>{{ registro.mesatual }}</td>
+                        <td>{{ registro.trimestre }}</td>
+                        <td>{{ registro.semestre }}</td>
+                        <td>{{ registro.desviopadrao }}</td>
+                        <td>{{ registro.estoqueatual }}</td>
+                        <td>100</td>
+                        <td>{{ registro.leadtime }}</td>
+                        <td>{{ registro.chegadaAtual }}</td>
+                        <td class="mes-futuro">{{ registro.chegada1 }}</td>
+                        <td class="mes-futuro">{{ registro.chegada2 }}</td>
+                        <td class="mes-futuro">{{ registro.chegada3 }}</td>
+                         <td>{{ registro.programacaoAtual }}</td>
+                        <td class="mes-futuro">{{ registro.programacao1 }}</td>
+                        <td class="mes-futuro">{{ registro.programacao2 }}</td>
+                        <td class="mes-futuro" >{{ registro.programacao3 }}</td>
+                        <td>12.0</td>
+
+
+                        <td>
+                            <input type="number"
+                                   class="form-control form-control-sm input-qtd-comprada"
+                                   data-id="{{ registro.iddadosforecast }}"
+                                   value="{{ registro.qtdcomprada or 0 }}"
+                                   min="0"
+                                   {{'disabled' if current_user.tipo not in ['ADMIN', 'ADMIN_COMPRAS', 'ADMIN_REPRESENTANTE'] else '' }}>
+                        </td>
+
+                        <td>
+                            <!-- Botão: Adicionar Observação -->
+                            {% if current_user.tipo in ['ADMIN', 'ADMIN_COMPRAS', ADMIN_REPRESENTANTE] %}
+                                <button class="btn btn-sm btn-observacao-editar" onclick="toggleObservacao(this)">
+                                    <i class="fas fa-comment-alt"></i>
+                                </button>
+                             {% endif %}
+
+                            <!-- Botão: Visualizar Observação -->
+                            <button class="btn btn-sm btn-observacao-ver"
+                                    data-id="{{ registro.iddadosforecast }}"
+                                    title="Ver observação">
+                                <i class="fas fa-eye"></i>
+                            </button>
+
+                            <!-- Área de adicionar observação (inline) -->
+                            <div class="observacao-box mt-2 d-none" >
+                                <textarea class="form-control" rows="2" placeholder="Digite a observação..."></textarea>
+
+                                <div class="d-flex align-items-center justify-content-between mt-1">
+                                    <button class="btn btn-sm btn-success salvar-observacao">Salvar</button>
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" id="estoque" name="obsfixa" value="T">
+                                        <label class="form-check-label" for="estoque">Obs. Fixa</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </td>
+                          <td style="display: none;">{{ registro.seqmes }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="Paginação">
+                <ul class="pagination justify-content-center mt-4">
+
+                    <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ page - 1 }}">Anterior</a>
+                    </li>
+
+                    {% for p in range(1, total_pages + 1) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+
+                    <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ page + 1 }}">Próxima</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="modal fade" id="modalObservacao" tabindex="-1" aria-labelledby="modalObservacaoLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalObservacaoLabel">Observações do Produto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+              </div>
+              <div class="modal-body" id="conteudoObservacao">
+                <p class="text-muted">Carregando...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="modalBuscaForecast" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Pesquisa de Forecast
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <input type="text" id="campoBusca" class="form-control"
+                                   placeholder="Buscar produto por nome ou descrição">
+                            <button class="btn btn-outline-primary" id="btnBuscar">Buscar</button>
+                        </div>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Mês forecast</th>
+                                <th>Seq. mês</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tabelaMesesForecast"></tbody>
+                        </table>
+                        <div id="paginacao" class="text-center mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

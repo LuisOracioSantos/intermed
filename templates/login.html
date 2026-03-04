@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Forecast SQ</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
-  </head>
-  <body>
-  <div class="login-container">
+
+<body>
+<div class="login-container">
     <!-- Logo centralizada e maior -->
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="login-logo">
 
 
     <form method="POST" action="{{ url_for('autenticar') }}">
-      <input type="hidden" name="proxima" value="{{ proxima or url_for('principal') }}">
-      <p><label>Usuário:</label> <input class="form-control" type="text" name="usuario" required></p>
-      <p><label>Senha:</label> <input class="form-control" type="password" name="senha" required></p>
-      <p><button class="btn btn-success btn-login" type="submit">Entrar</button></p>
+        <input type="hidden" name="proxima" value="{{ proxima or url_for('principal') }}">
+        <p><label>Usuário:</label> <input class="form-control" id="usuario" type="text" name="usuario" required></p>
+        <p><label>Senha:</label> <input class="form-control" id="senha" type="password" name="senha" required></p>
+        <p>
+            <button class="btn btn-success btn-login" type="submit">Entrar</button>
+        </p>
     </form>
 
     {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul id="messages" class="list-unstyled mt-3">
+    {% if messages %}
+    <ul id="messages" class="list-unstyled mt-3">
         {% for message in messages %}
-          <li class="alert alert-success">{{ message }}</li>
+        <li class="alert alert-success">{{ message }}</li>
         {% endfor %}
-        </ul>
-      {% endif %}
+    </ul>
+    {% endif %}
     {% endwith %}
-  </div>
+</div>
 </body>
 </html>

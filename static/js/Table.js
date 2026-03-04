@@ -1,15 +1,6 @@
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Modal observação
-    const modal = document.getElementById('modalObservacao');
-    if (modal) {
-        modal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const observacao = button.getAttribute('data-observacao') || 'Sem observação';
-            document.getElementById('conteudoObservacao').innerText = observacao;
-        });
-    }
 
     // Filtro da tabela
     const filtroInput = document.getElementById('filtroTabela');

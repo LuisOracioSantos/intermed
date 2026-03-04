@@ -1,8 +1,8 @@
 from collections import defaultdict, Counter
 
-
 def agrupar_vendas_por_cliente(vendas):
-    agrupado = defaultdict(lambda: {'codigo': None, 'cliente': '', 'total_venda': 0.0, 'qtd_vendas': 0, 'dataCadastroCli':None})
+    agrupado = defaultdict(
+        lambda: {'codigo': None, 'cliente': '', 'total_venda': 0.0, 'qtd_vendas': 0, 'dataCadastroCli': None})
     for venda in vendas:
         cid = venda['idCliente']
         agrupado[cid]['codigo'] = cid
@@ -13,10 +13,12 @@ def agrupar_vendas_por_cliente(vendas):
             agrupado[cid]['dataCadastroCli'] = venda.get('dataCadastroCli')
     return list(agrupado.values())
 
+
 def clientes_valiosos(vendas, limite=50000.00):
     clientes = agrupar_vendas_por_cliente(vendas)
     valiosos = [c for c in clientes if c['total_venda'] > limite]
     return sorted(valiosos, key=lambda x: x['cliente'])
+
 
 def clientes_nao_valiosos(vendas, limite=1000):
     clientes = agrupar_vendas_por_cliente(vendas)

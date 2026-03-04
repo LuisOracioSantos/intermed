@@ -1,0 +1,60 @@
+{% extends "template.html" %}
+{% block conteudo %}
+
+ <link rel="stylesheet" href="{{ url_for('static', filename='css/configproduto.css') }}">
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="mb-4">Atualizar Cadastros</h2>
+                <form action="{{ url_for('atualizacoes') }}" method="post">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="data_inicial" class="form-label">Data Inicial:</label>
+                            <input type="date" id="data_inicial" name="data_inicial" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="data_final" class="form-label">Data Final:</label>
+                            <input type="date" id="data_final" name="data_final" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <fieldset class="mb-4">
+                        <legend class="mb-2">Opções para atualizar:</legend>
+                        <div class="row">
+                            <div class="col-md-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="vendas" name="opcoes" value="vendas">
+                                    <label class="form-check-label" for="vendas">Vendas</label>
+                                </div>
+                            </div>
+                            <div class="col-md-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="produtos" name="opcoes" value="produtos">
+                                    <label class="form-check-label" for="produtos">Produtos</label>
+                                </div>
+                            </div>
+                            <div class="col-md-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="estoque" name="opcoes" value="estoque">
+                                    <label class="form-check-label" for="estoque">Estoque</label>
+                                </div>
+                            </div>
+                            <div class="col-md-auto">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="leadtime" name="opcoes" value="leadtime">
+                                    <label class="form-check-label" for="leadtime">Leadtime</label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <button type="submit" class="btn btn-primary">Atualizar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

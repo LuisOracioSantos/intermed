@@ -1,52 +1,53 @@
-<!DOCTYPE html>
-<html>
+<html lang="pt-BR">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>SQ Quimica</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='template.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
         <script src="{{ url_for('static', filename='js/atualizardados.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     </head>
     <body>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul id="messages" class="list-unstyled">
-                    {% for message in messages %}
-                        <li class="alert alert-success">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-
 
         <nav class="navbar navbar-expand-lg navbar-light principal-navbar shadow-sm w-100">
           <div class="container-fluid justify-content-between align-items-center">
 
-            <!-- ✅ Imagem no canto esquerdo -->
             <div class="d-flex align-items-center">
               <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo"  class="me-3">
 
-              <!-- Links do menu -->
               <div class="navbar-nav">
-                <a class="nav-link" href="{{ ('/') }}"><i class="fas fa-box"></i> Produtos</a>
-                <a class="nav-link" href="{{ url_for('vendacliente') }}"><i class="fas fa-users"></i> Venda Clientes</a>
+                  {% if current_user.tipo in ['ADMIN', 'COMPRAS', 'ADMIN_COMPRAS' ,'VIEW'] %}
+                    <a class="nav-link" href="{{ ('/') }}"><i class="fas fa-box"></i> Forecast</a>
+                  {% endif %}
+
+                  {% if current_user.tipo in ['ADMIN', 'REPRESENTANTE', ADMIN_REPRESENTANTE] %}
+                    <a class="nav-link" href="{{ url_for('vendacliente') }}"><i class="fas fa-users"></i> Vendas - Clientes x Produtos</a>
+                    <a class="nav-link" href="{{ url_for('venda_periodo_produto_representante') }}"><i class="fas fa-users"></i> Vendas - Produtos x Clientes</a>
+                  {% endif %}
               </div>
             </div>
 
-            <!-- Botão de opções à direita -->
             <div class="d-flex align-items-center gap-3">
               <div class="dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="menuButton" data-bs-toggle="dropdown" aria-expanded="false">
                   Opções
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuButton">
-                  <li><a class="dropdown-item" href="#" onclick="atualizarDados()">Atualizar Dados</a></li>
-                  <li><a class="dropdown-item" href="#">Usuário</a></li>
+                    {% if current_user.tipo in ['ADMIN', 'COMPRAS', 'ADMIN_COMPRAS'] %}
+                        <li><a class="dropdown-item" href="{{ url_for('configproduto') }}">Configuração Produtos</a></li>
+                    {% endif %}
+                    
+                    {% if current_user.tipo in ['ADMIN', 'ADMIN_COMPRAS', ADMIN_REPRESENTANTE] %}
+                        <li><a class="dropdown-item" href="{{ url_for('atualizacoes') }}">Atualizar Dados</a></li>
+                    {% endif %}
+                  <li><a class="dropdown-item" href="{{ url_for('alterarusuario') }}">Usuário</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
                         <i class="fas fa-sign-out-alt"></i> Sair</a></li>
@@ -65,7 +66,11 @@
             </div>
         </div>
 
+    <main class="content container-fluid ">
+
         {% block conteudo %} {% endblock %}
+    </main>
+
     </body>
 
 </html>

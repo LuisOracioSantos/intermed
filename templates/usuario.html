@@ -1,0 +1,67 @@
+ {% extends "template.html" %}
+ {% block conteudo %}
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/configproduto.css') }}">
+
+
+
+ <div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                        <h3 class="card-title text-center mb-4">Editar Usuário</h3>
+
+                        <form method="POST" action="{{ url_for('alterarsenhausuario') }}">
+
+                            <div class="mb-3">
+                                <label for="login" class="form-label">Login:</label>
+                                <input type="text" class="form-control" id="login"  value="{{ current_user.nome }}" name="login"  required readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="senha" class="form-label">Senha:</label>
+                                <input type="password" class="form-control" id="senha" name="senha" placeholder="Digite nova senha">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="perfil" class="form-label">Perfil:</label>
+                                 <input type="text" class="form-control" id="perfil"  value="{{ current_user.get_perfil_formatado() }}" name="perfil"  required readonly>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+ {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+ <script>
+  // Seleciona todos os alerts
+  const alerts = document.querySelectorAll('.alert');
+
+  alerts.forEach(alert => {
+    // Remove cada alerta depois de 3 segundos (3000 ms)
+    setTimeout(() => {
+      // Fade out (opcional)
+      alert.classList.remove('show');
+      alert.classList.add('hide');
+      setTimeout(() => alert.remove(), 500); // remove do DOM
+    }, 3000);
+  });
+
+</script>
+
+{% endblock %}
