@@ -59,21 +59,21 @@
                         <th style="background-color:#0eaf97; color:white;" id="mes1">Mês 1</th>
                         <th style="background-color:#0eaf97; color:white;" id="mes2">Mês 2</th>
                         <th style="background-color:#0eaf97; color:white;" id="mes3">Mês 3</th>
-                        <th style="background-color:#0eaf97; color:white;">Mês atual</th>
+                        <th style="background-color:#fff9c4; color:black;">Mês atual</th>
                         <th style="background-color:#0eaf97; color:white;">Trim</th>
                         <th style="background-color:#0eaf97; color:white;">Sem</th>
                         <th style="background-color:#0eaf97; color:white;">Desvio Padrão (Trim)</th>
-                        <th style="background-color:#0eaf97; color:white;">Est. Atual</th>
+                        <th style="background-color:#fff9c4; color:black;">Est. Atual</th>
                         <th style="background-color:#0eaf97; color:white;">Est. Seg.</th>
                         <th style="background-color:#0eaf97; color:white;">Lead time.</th>
-                        <th style="background-color:#0eaf97; color:white;" id="chegada1" data-group="chegada">Chegada1 <span class="toggle-colunas" data-group="chegada" style="cursor:pointer;">▼</span> </th>
-                        <th style="background-color:#0eaf97; color:white;" id="chegada2" data-group="chegada">Chegada2 </th>
-                        <th style="background-color:#0eaf97; color:white;" id="chegada3" data-group="chegada">Chegada3 </th>
-                        <th style="background-color:#0eaf97; color:white;" id="chegada4" data-group="chegada">Chegada4 </th>
-                        <th style="background-color:#0eaf97; color:white;" id="prog1" data-group="prog">Prog1 <span class="toggle-colunas" data-group="prog" style="cursor:pointer;">▼</span> </th>
-                        <th style="background-color:#0eaf97; color:white;" id="prog2" data-group="prog">Prog2 </th>
-                        <th style="background-color:#0eaf97; color:white;" id="prog3" data-group="prog">Prog3 </th>
-                        <th style="background-color:#0eaf97; color:white;" id="prog4" data-group="prog">Prog4 </th>
+                        <th style="background-color:#F55A38; color:black;" id="chegada1" data-group="chegada">Chegada1 <span class="toggle-colunas" data-group="chegada" style="cursor:pointer;">▼</span> </th>
+                        <th style="background-color:#F55A38; color:black;" id="chegada2" data-group="chegada">Chegada2 </th>
+                        <th style="background-color:#F55A38; color:black;" id="chegada3" data-group="chegada">Chegada3 </th>
+                        <th style="background-color:#F55A38; color:black;" id="chegada4" data-group="chegada">Chegada4 </th>
+                        <th style="background-color:#fff9c4; color:black;" id="prog1" data-group="prog">Prog1 <span class="toggle-colunas" data-group="prog" style="cursor:pointer;">▼</span> </th>
+                        <th style="background-color:#fff9c4; color:black;" id="prog2" data-group="prog">Prog2 </th>
+                        <th style="background-color:#fff9c4; color:black;" id="prog3" data-group="prog">Prog3 </th>
+                        <th style="background-color:#fff9c4; color:black;" id="prog4" data-group="prog">Prog4 </th>
                         <th style="background-color:#0eaf97; color:white;" id="prevIA">Previsão IA</th>
                         <th style="background-color:#0eaf97; color:white;" id="qtdcomprada">Qtd. Comprado</th>
                         <th style="background-color:#0eaf97; color:white;" id="observacao">Observação</th>
@@ -103,7 +103,8 @@
                         <td>{{ registro.semestre }}</td>
                         <td>{{ registro.desviopadrao }}</td>
                         <td>{{ registro.estoqueatual }}</td>
-                        <td>100</td>
+                        <td>{% set est_seg = (registro.trimestre / 30) * registro.leadtime %}
+                                 {{ est_seg | round(2) }}</td>
                         <td>{{ registro.leadtime }}</td>
                         <td>{{ registro.chegadaAtual }}</td>
                         <td class="mes-futuro">{{ registro.chegada1 }}</td>

@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tdId.textContent = item.id;
 
             const tdMes = document.createElement('td');
+
             tdMes.textContent = item.mes;
 
             const tdSeqMes= document.createElement('td');
@@ -523,7 +524,5 @@ document.addEventListener('DOMContentLoaded', function () {
         e.target.textContent = expandido ? "▼" : "▲";
 
     });
-
-
 
 });

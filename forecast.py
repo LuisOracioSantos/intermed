@@ -354,24 +354,34 @@ def getProdutos():
         "total_paginas": (total + per_page - 1) // per_page
     })
 
+
 @app.route('/getMesesForecast')
 def getmesesforecast():
     try:
         dados = get_meses_forecast()
 
+        meses_pt = {
+            1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
+            5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto",
+            9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"
+        }
+
         resultado = []
         for item in dados:
             id_forecast = item.get("idmesforecast")
-            data_mes = item.get("mesforecast")
+            data_mes_str = item.get("mesforecast")  # "2025-09-01"
             seq_mes = item.get("seqmes")
             fechado = item.get("fechado")
 
-            data_formatada = datetime.strptime(data_mes, "%Y-%m-%d").strftime("%B/%Y")
+            dt = datetime.strptime(data_mes_str, "%Y-%m-%d")
+
+            nome_mes = meses_pt[dt.month]
+            data_formatada = f"{nome_mes}/{dt.year}"
 
             resultado.append({
                 "id": id_forecast,
-                "mes": data_formatada.capitalize(),
-                "seqmes": seq_mes,# Capitaliza o mês
+                "mes": data_formatada,
+                "seqmes": seq_mes,
                 "fechado": fechado
             })
 
