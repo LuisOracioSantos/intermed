@@ -130,6 +130,27 @@ def get_produtos_cadastro():
     produtos = response.json()
     return produtos
 
+def get_all_produtos_cadastrados():
+    response = requests.get("http://127.0.0.1:8080/produtos/listartodoscadastrados")
+    produtos = response.json()
+    return produtos
+
+def alterar_status_produto_forecast(id_produto):
+    try:
+        response = requests.patch(f'http://127.0.0.1:8080/forecast/{id_produto}/inativar')
+
+        if response.status_code == 204:
+            return jsonify({"mensagem": "Status atualizado com sucesso"}), 204
+
+        elif response.status_code == 404:
+            return jsonify({"erro": "Produto não encontrado"}), 404
+
+        else:
+            return jsonify({"erro": "Erro ao atualizar status"}), 500
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
 
 def get_dados_venda_cliente():
     response = requests.get("http://127.0.0.1:8080/vendas/dadosvendacliente")

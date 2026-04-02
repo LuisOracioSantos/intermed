@@ -13,7 +13,7 @@ from service.controllerservice import get_Dados_Forecast_Produto, atualizar_todo
     grava_observacao_forecast, lista_observacao_forecast, atualiza_dadositens_forecast, get_dados_venda_cliente, \
     autenticar_representante, get_dados_venda_periodo_rep, get_dados_venda_produto_periodo_rep, \
     get_dados_venda_cliente_produto_id, atualiza_dados_forecast_tela, fecharForecast, getRepresentanteUser, \
-    deletar_produto, altera_senha_representante
+    deletar_produto, altera_senha_representante, get_all_produtos_cadastrados, alterar_status_produto_forecast
 from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from datetime import datetime
@@ -355,6 +355,35 @@ def getProdutos():
     })
 
 
+
+@app.route('/getProdutosCadastrado', methods=['GET'])
+@login_required
+def getProdutosCadastrados():
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 20))
+    termo_busca = request.args.get('busca', '').strip().lower()
+
+    produtos = get_all_produtos_cadastrados()
+
+    if termo_busca:
+        produtos = [
+            p for p in produtos
+            if termo_busca in p['item'].lower() or termo_busca in p['descricao'].lower()
+        ]
+
+    # chama função auxiliar
+    total = len(produtos)
+    start = (page - 1) * per_page
+    end = start + per_page
+    produtos_paginados = produtos[start:end]
+
+    return jsonify({
+        "produtos": produtos_paginados,
+        "pagina_atual": page,
+        "total_paginas": (total + per_page - 1) // per_page
+    })
+
+
 @app.route('/getMesesForecast')
 def getmesesforecast():
     try:
@@ -441,6 +470,11 @@ def fechar_forecast():
 @app.route('/deletaprodutoforecast/<int:idproduto>', methods=['DELETE'])
 def deletaprodutorecast(idproduto):
     return deletar_produto(idproduto)
+
+@app.route('/inativarprodutoforecast/<int:idproduto>', methods=['PATCH'])
+def inativar_produto(idproduto):
+    return alterar_status_produto_forecast(idproduto)
+
 
 @app.route('/alterarsenha', methods=['GET', 'POST'])
 @login_required

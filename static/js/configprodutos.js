@@ -58,7 +58,7 @@ window.addEventListener("load", function () {
                             relacionados.forEach(rel => {
                                 const trNovo = document.createElement("tr");
                                 trNovo.innerHTML = `
-                                    <td>${rel.itemId}</td>
+                                    <td>${rel.itemid}</td>
                                     <td>${rel.item}</td>
                                     <td>${rel.descricao}</td>
                                     <td><input type="radio" name="produtoPrincipal" value="${rel.itemId}"></td>
@@ -81,6 +81,79 @@ window.addEventListener("load", function () {
         });
             renderizarPaginacao(data.pagina_atual, data.total_paginas, termoBusca);
     });
+}
+
+
+
+    let paginaAtual = 1;
+    let termoBuscaLista = "";
+   function carregarListaProdutos(page = 1) {
+    paginaAtual = page;
+
+    fetch(`/getProdutosCadastrado?page=${page}&per_page=10&busca=${termoBuscaLista}`)
+        .then(res => res.json())
+        .then(data => {
+
+            const tabela = document.getElementById("tabelaListaProdutos");
+            tabela.innerHTML = "";
+
+           let html = "";
+
+            data.produtos.forEach(p => {
+                console.log(p);
+                const botaoStatus = p.ativo
+                  ? `<button class="btn btn-sm btn-outline-warning me-1"
+                        onclick="inativarprodutoforecast(${p.idprodutoforecast})"
+                        title="Inativar">
+                        <i class="bi bi-pause-circle"></i>
+                     </button>`
+                  : `<button class="btn btn-sm btn-outline-success me-1"
+                        onclick="inativarprodutoforecast(${p.idprodutoforecast})"
+                        title="Ativar">
+                        <i class="bi bi-check-circle"></i>
+                     </button>`;
+
+                html += `
+                    <tr>
+                        <td>${p.idprodutoforecast}</td>
+                        <td>${p.item}</td>
+                        <td>${p.descricao}</td>
+                        <td>${p.ativo ? 'Ativo' : 'Inativo'}</td>
+                        <td class="text-center">
+                            ${botaoStatus}
+                            <button class="btn btn-sm btn-outline-danger"
+                                    onclick="deletarProduto(${p.idprodutoforecast})"
+                                    title="Excluir">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tabela.innerHTML = html;
+
+            montarPaginacao(data.pagina_atual, data.total_paginas);
+        });
+}
+
+function buscarListaProdutos() {
+    termoBuscaLista = document.getElementById("buscaLista").value;
+    carregarListaProdutos(1);
+}
+
+function montarPaginacao(paginaAtual, totalPaginas) {
+    const paginacao = document.getElementById("paginacaoLista");
+    paginacao.innerHTML = "";
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        paginacao.innerHTML += `
+            <button class="btn btn-sm ${i === paginaAtual ? 'btn-primary' : 'btn-outline-primary'} me-1"
+                onclick="carregarListaProdutos(${i})">
+                ${i}
+            </button>
+        `;
+    }
 }
 
 
@@ -244,12 +317,10 @@ function salvaProdutoForecast() {
     });
 }
 
-function deletarProduto() {
-
-    const id = document.getElementById("idprod").value;
+function deletarProduto(id) {
 
     if (!id) {
-        alert("Nenhum produto selecionado para deletar.");
+        alert("ID inválido.");
         return;
     }
 
@@ -263,7 +334,7 @@ function deletarProduto() {
     .then(response => {
         if (response.status === 204) {
             alert("Produto deletado com sucesso!");
-            window.location.reload(); // ou redirecionar
+            carregarListaProdutos(paginaAtual);
         }
         else if (response.status === 404) {
             alert("Produto não encontrado.");
@@ -278,11 +349,34 @@ function deletarProduto() {
     });
 }
 
+function inativarprodutoforecast(idproduto) {
+
+    if (!confirm("Deseja alterar o status deste produto?")) {
+        return;
+    }
+
+    fetch(`/inativarprodutoforecast/${idproduto}`, {
+       method: "PATCH"
+    })
+    .then(response => {
+        if (response.ok) {
+            // ✅ Atualiza tabela
+            carregarListaProdutos(paginaAtual);
+        } else {
+            alert("Erro ao alterar status");
+        }
+    })
+    .catch(error => {
+        console.error("Erro:", error);
+        alert("Erro de conexão");
+    });
+}
+
 function limparFormulario() {
     // Limpar campos de entrada
     document.getElementById("idprod").value = "";
     document.getElementById("item").value = "";
-     document.getElementById("iditemprincipal").value = "";
+    document.getElementById("iditemprincipal").value = "";
     document.getElementById("itemdescricao").value = "";
 
     // Limpar tabela de produtos relacionados

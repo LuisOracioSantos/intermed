@@ -1,107 +1,163 @@
- {% extends "template.html" %}
- {% block conteudo %}
+{% extends "template.html" %}
+{% block conteudo %}
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/configproduto.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/configproduto.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
- <style>
+
+<style>
   #tabelaProdutosCadastro tr:hover {
-    background-color: yellow ; /* Cor de fundo ao passar o mouse */
-    cursor: pointer; /* Mostra o cursor como "clicável" */
+    background-color: yellow;
+    cursor: pointer;
   }
 </style>
 
-  <div class="row justify-content-center mt-4">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                    <h2 class="mb-4">Cadastro de Produtos</h2>
-                        <div class="mb-3">
-                             <input type="text" id="idprod" class="form-control mt-3" placeholder="ID do produto" readonly>
-                              <label for="iditemprincipal" class="form-label">Produto Principal:</label>
-                              <div class="d-flex gap-2">
+<div class="row justify-content-center mt-4">
+  <div class="col-md-10">
+    <div class="card shadow-sm">
+      <div class="card-body">
 
-                                    <input type="text" id="iditemprincipal" class="form-control" placeholder="ID do produto principal" readonly>
-                                  <input type="text" id="item" class="form-control" placeholder="Nome do produto principal" readonly>
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes">Buscar</button>
-                              </div>
-                            </div>
+        <h2 class="mb-4">Cadastro de Produtos</h2>
 
-                            <div class="mb-3">
-                              <div class="d-flex gap-2">
-                                <input type="text" id="itemdescricao" class="form-control" placeholder="Descrição do produto principal" readonly>
-                              </div>
-                            </div>
+        <!-- ABAS -->
+        <ul class="nav nav-tabs" id="produtoTabs" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link active" id="cadastro-tab" data-bs-toggle="tab" data-bs-target="#cadastro" type="button">
+              Cadastro
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="lista-tab" data-bs-toggle="tab" data-bs-target="#lista" type="button" onclick="carregarListaProdutos()">
+              Produtos Cadastrados
+            </button>
+          </li>
+        </ul>
 
-                            <div class="mb-3 row">
-                              <div class="col-sm-2 d-flex gap-2">
-                                <button class="btn btn-success" onclick="adicionarProdutoRelacionado()">Adicionar</button>
-                                  <button class="btn btn-primary" onclick="limparFormulario()">Limpar</button>
-                              </div>
-                            </div>
+        <div class="tab-content mt-3">
 
-                        <!-- Tabela de Produtos Filhos -->
-                            <h5 class="mt-4">Produtos Relacionados:</h5>
-                                <table class="table table-bordered table-striped mt-2" id="tabelaProdutosRelacionados">
-                                  <thead class="table-light">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Item</th>
-                                        <th>Descricao</th>
-                                        <th>Item Principal</th>
-                                        <th></th>
-                                    </tr>
-                                  </thead>
-                                  <tbody></tbody>
-                                </table>
+          <!-- ABA 1: CADASTRO -->
+          <div class="tab-pane fade show active" id="cadastro">
 
-                            <button class="btn btn-success mt-4" onclick="salvaProdutoForecast()">Salvar Produto</button>
-                            <button class="btn btn-danger mt-4" onclick="deletarProduto()">Deletar produto</button>
-                            <button class="btn btn-danger mt-4" onclick="">Inativar produto</button>
-                      </div>
+            <div class="mb-3">
+              <input type="text" id="idprod" class="form-control mt-3" placeholder="ID do produto" readonly>
+
+              <label class="form-label mt-3">Produto Principal:</label>
+              <div class="d-flex gap-2">
+                <input type="text" id="iditemprincipal" class="form-control" placeholder="ID do produto principal" readonly>
+                <input type="text" id="item" class="form-control" placeholder="Nome do produto principal" readonly>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalDetalhes">Buscar</button>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <input type="text" id="itemdescricao" class="form-control" placeholder="Descrição do produto principal" readonly>
+            </div>
+
+            <div class="mb-3 row">
+              <div class="col-sm-3 d-flex gap-2">
+                <button class="btn btn-success" onclick="adicionarProdutoRelacionado()">Adicionar</button>
+                <button class="btn btn-primary" onclick="limparFormulario()">Limpar</button>
+              </div>
+            </div>
+
+            <h5 class="mt-4">Produtos Relacionados:</h5>
+            <table class="table table-bordered table-striped mt-2" id="tabelaProdutosRelacionados">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Item</th>
+                  <th>Descricao</th>
+                  <th>Item Principal</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+
+            <button class="btn btn-success mt-4" onclick="salvaProdutoForecast()">Salvar Produto</button>
 
 
-                    <div class="modal fade" id="modalDetalhes" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">
-                              Pesquisa de produtos
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                          </div>
+          </div>
 
-                          <div class="modal-body">
-                              <div class="input-group mb-3">
-                                <input type="text" id="campoBusca" class="form-control" placeholder="Buscar produto por nome ou descrição">
-                                <button class="btn btn-outline-primary" onclick="carregarProdutos(1)">Buscar</button>
-                              </div>
-                            <table class="table table-bordered">
-                              <thead>
-                                <tr>
-                                  <th>ID</th>
-                                  <th>Item</th>
-                                  <th>Descrição</th>
-                                </tr>
-                              </thead>
-                              <tbody id="tabelaProdutosCadastro"></tbody>
-                            </table>
-                            <div id="paginacao" class="text-center mt-3"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-           </div>
-         </div>
+          <!-- ABA 2: LISTAGEM -->
+          <div class="tab-pane fade" id="lista">
+
+            <h5 class="mt-3">Produtos Cadastrados</h5>
+
+            <div class="input-group mb-3">
+              <input type="text" id="buscaLista" class="form-control" placeholder="Buscar produto...">
+              <button class="btn btn-outline-primary" onclick="buscarListaProdutos()">Buscar</button>
+            </div>
+
+
+
+            <table class="table table-bordered table-striped mt-3">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Item</th>
+                  <th>Descrição</th>
+                  <th>Status</th>
+                   <th>Inativar/ Excluir</th>
+                  </td>
+                </tr>
+              </thead>
+              <tbody id="tabelaListaProdutos">
+                <!-- preenchido via JS -->
+              </tbody>
+            </table>
+              <div id="paginacaoLista" class="text-center mt-3"></div>
+          </div>
+
+        </div>
+
+      </div>
     </div>
+  </div>
+</div>
 
-<!-- Passa itemid do Flask para JS de forma segura -->
+<!-- MODAL (mantido igual) -->
+<div class="modal fade" id="modalDetalhes" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Pesquisa de produtos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="input-group mb-3">
+          <input type="text" id="campoBusca" class="form-control" placeholder="Buscar produto">
+          <button class="btn btn-outline-primary" onclick="carregarProdutos(1)">Buscar</button>
+        </div>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Item</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaProdutosCadastro"></tbody>
+        </table>
+
+        <div id="paginacao" class="text-center mt-3"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-    const itemIdInicial = {{ itemid | tojson }};
-    const itemInicial = {{ item | tojson }};
-    const descricaoInicial = {{ descricao | tojson }};
-    const proximaTela = {{ proxima | tojson }};
+  const itemIdInicial = {{ itemid | tojson }};
+  const itemInicial = {{ item | tojson }};
+  const descricaoInicial = {{ descricao | tojson }};
+  const proximaTela = {{ proxima | tojson }};
 </script>
-<script src="{{ url_for('static', filename='js/configprodutos.js') }}"></script>
 
+<script src="{{ url_for('static', filename='js/configprodutos.js') }}"></script>
 
 {% endblock %}
